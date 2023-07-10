@@ -1,16 +1,26 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import Paginate from "vuejs-paginate-next";
 import { ITEMS_PER_PAGE_COUNT, ROUTE_NAMES } from '../constants'
 import { useRouter } from 'vue-router'
+import { useRatesStore } from '@/stores/rates'
+import { storeToRefs } from "pinia";
 
 const props = defineProps({
   rates: Array,
 })
 
 const router = useRouter()
+const { searchValue } = storeToRefs(useRatesStore());
 
 const currentPage = ref(1)
+
+// Set first page if search value was changed to prevent empty pages
+watch(searchValue, () => {
+  if (currentPage.value !== 1) {
+    currentPage.value = 1
+  }
+})
 
 const pagesCount = computed(() => {
   return Math.ceil(props.rates.length / ITEMS_PER_PAGE_COUNT)
